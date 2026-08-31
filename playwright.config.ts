@@ -8,19 +8,27 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 2 : 1,
+  workers: process.env.CI ? 1 : 4,
+  timeout: 60000,
   reporter: 'html',
   use: {
     baseURL: process.env.UI_BASE_URL,
     headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    navigationTimeout: 45000,
+    actionTimeout: 15000,
   },
   projects: [
     {
       name: 'chromium',
       use: { browserName: 'chromium' },
+    },
+
+     {
+      name: 'firefox',
+      use: { browserName: 'firefox' },
     },
   ],
 });
