@@ -92,50 +92,27 @@ npx playwright test tests/api/
 
 # Run a specific test
 npx playwright test tests/ui/login.spec.ts
-
-# Run tests in headed mode
-npx playwright test --headed
-
-# Run tests in debug mode
-npx playwright test --debug
+npx playwright test tests/api
 ```
 
-## Test Report
-Open the Playwright HTML report:
-
-```bash
-npx playwright show-report
+View the last HTML report:
+```
+npm run test:report
 ```
 
-Screenshots and traces are captured for failed tests and stored in the test results.
+Type-check without running tests:
+```
+npm run typecheck
+```
 
-## Testing Coverage
+## Configuration Notes
 
-### UI
-- Login and authentication
-- Dashboard validation
-- Form validation
-- Positive and negative scenarios
-- End-to-end workflows
-- Page Object Model
+- Tests run across multiple projects (see `playwright.config.ts` → `projects`): `chrome`, `edge`, `firefox`, `webkit`, `mobile-chrome`, `mobile-safari`, `tablet`. Target one with `npx playwright test --project=<name>` or `npm run test:<name>`.
+- Headless on CI (`process.env.CI` set), headed locally so you can watch the run.
+- On CI, tests retry twice and run with a single worker; locally there are no retries and workers default to Playwright's auto-detection.
+- Screenshots and traces are captured only on failure; video is retained only on failure.
+- API requests authenticate via the `x-api-key` header, read from `REQRES_API_KEY`.
 
-### API
-- GET, POST, PUT and DELETE requests
-- Request and response validation
-- Status code validation
-- Positive and negative scenarios
-- API data validation
+## CI (Jenkins)
 
-## CI/CD
-The project includes a Jenkins pipeline that:
-
-1. Checks out the code
-2. Installs dependencies
-3. Installs Playwright
-4. Runs automated tests
-5. Generates test reports
-6. Archives test results
-
-## Author
-Shikha Sharma  
-Senior Test Engineer | QA Automation | Playwright | API Testing
+The `Jenkinsfile` at the repo root defines the pipeline: checkout → `npm ci` → write `.env` → install Playwright browsers → typecheck → run tests → publish the Playwright HTML report and archive `test-results/`. See the Jenkins job `ORANGEHRM_AUTOMATION` for the configured job (built off the `feature` branch).

@@ -6,6 +6,13 @@
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
+    "test:chrome": "playwright test --project=chrome",
+    "test:edge": "playwright test --project=edge",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile-chrome": "playwright test --project=mobile-chrome",
+    "test:mobile-safari": "playwright test --project=mobile-safari",
+    "test:tablet": "playwright test --project=tablet",
     "test:report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
