@@ -20,6 +20,7 @@ test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     dashboard = new DashboardPage(page);
+    await dashboard.waitForLoad();
   });
 
   // 1. Page Load & URL
@@ -61,9 +62,9 @@ test.describe('Dashboard', () => {
 
   // 5. Employees on Leave Today Widget
   test.describe('Employees on Leave Today Widget', () => {
-    test('Verify clicking the settings icon navigates to leave page', async () => {
+    test('Verify clicking the settings icon opens the configuration dialog', async () => {
       await dashboard.clickLeaveSettingsIcon();
-      await dashboard.verifyLeaveUrl();
+      await dashboard.verifyLeaveConfigDialogVisible();
     });
 
     test('Verify employee leave data or empty state message is shown', async () => {
@@ -134,10 +135,10 @@ test.describe('Dashboard', () => {
       await dashboard.verifyPIMUrl();
     });
 
-    test('Verify clicking home logo returns to dashboard', async () => {
+    test('Verify clicking home logo navigates to the OrangeHRM website', async () => {
       await dashboard.clickSidebarMenuItem('Admin');
       await dashboard.clickHomeLogo();
-      await dashboard.verifyDashboardUrl();
+      await dashboard.verifyHomeLogoLinksToOrangeHRMSite();
     });
   });
 });

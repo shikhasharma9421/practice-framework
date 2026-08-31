@@ -22,7 +22,7 @@ export class DashboardPage {
     this.myActionsItems     = page.locator('.orangehrm-todo-list-item');
     this.quickLaunchButtons = page.locator('.oxd-icon-button.orangehrm-quick-launch-icon');
     this.buzzPostContent    = page.locator('.oxd-grid-item.oxd-grid-item--gutters.orangehrm-buzz-widget-card');
-    this.employeesOnLeave   = page.locator('.orangehrm-dashboard-widget-body-nocontent');
+    this.employeesOnLeave   = page.locator('.orangehrm-leave-card');
     this.noEmployeesOnLeaveMessage = page.locator('.orangehrm-dashboard-widget-body-nocontent');
     this.topBar             = page.locator('.oxd-topbar-header');
     this.sidebarMenuItem    = page.locator('.oxd-main-menu-item');
@@ -35,6 +35,10 @@ export class DashboardPage {
   }
 
   // ── Page Load ──────────────────────────────────────────────────────────────
+
+  async waitForLoad() {
+    await this.widgetHeadings.first().waitFor({ state: 'visible' });
+  }
 
   async verifyDashboardUrl() {
     await expect(this.page).toHaveURL(/dashboard/);
@@ -74,17 +78,25 @@ export class DashboardPage {
   async clickLeaveSettingsIcon() {
     await this.widgets
       .filter({ hasText: 'Employees on Leave Today' })
-      .locator('.orangehrm-leave-time-icon')
+      .locator('.orangehrm-leave-card-icon')
       .click();
   }
 
-  async verifyLeaveUrl() {
-    await expect(this.page).toHaveURL(/leave/);
+  async verifyLeaveConfigDialogVisible() {
+    await expect(
+      this.page.locator('.orangehrm-dialog-modal').filter({ hasText: 'Configurations' })
+    ).toBeVisible();
   }
 
   async verifyLeaveWidgetRendered() {
-    const rows    = await this.employeesOnLeave.count();
-    const message = await this.noEmployeesOnLeaveMessage.count();
+    const widget = this.widgets.filter({ hasText: 'Employees on Leave Today' });
+    await widget.waitFor({ state: 'visible' });
+    await widget
+      .locator('.orangehrm-dashboard-widget-loader')
+      .waitFor({ state: 'detached' })
+      .catch(() => {});
+    const rows    = await widget.locator('.orangehrm-leave-card').count();
+    const message = await widget.locator('.orangehrm-dashboard-widget-body-nocontent').count();
     expect(rows + message).toBeGreaterThan(0);
   }
 
@@ -101,6 +113,7 @@ export class DashboardPage {
   // ── Quick Launch ───────────────────────────────────────────────────────────
 
   async getQuickLaunchButtonCount(): Promise<number> {
+    await this.quickLaunchButtons.first().waitFor({ state: 'visible' });
     return this.quickLaunchButtons.count();
   }
 
@@ -141,15 +154,19 @@ export class DashboardPage {
   }
 
   async verifyAdminUrl() {
-    await expect(this.page).toHaveURL(/viewAdminModule/);
+    await expect(this.page).toHaveURL(/\/admin\//);
   }
 
   async verifyPIMUrl() {
-    await expect(this.page).toHaveURL(/viewPimModule/);
+    await expect(this.page).toHaveURL(/\/pim\//);
   }
 
   async clickHomeLogo() {
     await this.homeLogo.click();
+  }
+
+  async verifyHomeLogoLinksToOrangeHRMSite() {
+    await expect(this.page).toHaveURL(/orangehrm\.com/);
   }
 
   async navigateBack() {
